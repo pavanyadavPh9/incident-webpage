@@ -3,133 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Incident Creation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            color: #333;
-        }
-        .form-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            margin: auto;
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            font-size: 14px;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body>
-
-    <h1>ServiceNow Incident Creation</h1>
-
-    <!-- Incident Form -->
-    <div class="form-container">
-        <form id="incidentForm">
-            <label for="caller_id">Caller ID</label>
-            <input type="text" id="caller_id" name="caller_id" required>
-
-            <label for="category">Category</label>
-            <select id="category" name="category" required>
-                <option value="Software">Software</option>
-                <option value="Hardware">Hardware</option>
-                <option value="Network">Network</option>
-            </select>
-
-            <label for="short_description">Short Description</label>
-            <input type="text" id="short_description" name="short_description" required>
-
-            <label for="impact">Impact</label>
-            <select id="impact" name="impact" required>
-                <option value="1">High</option>
-                <option value="2">Medium</option>
-                <option value="3">Low</option>
-            </select>
-
-            <label for="urgency">Urgency</label>
-            <select id="urgency" name="urgency" required>
-                <option value="1">High</option>
-                <option value="2">Medium</option>
-                <option value="3">Low</option>
-            </select>
-
-            <button type="submit">Submit Incident</button>
-        </form>
-    </div>
-
-    <!-- JavaScript Code for Form Submission -->
+    <title>Create Incident</title>
     <script>
-        document.getElementById('incidentForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
+        // Function to handle the form submission and make the API call
+        function createIncident(event) {
+            event.preventDefault();  // Prevent the form from submitting normally
 
-            // Collect form data
+            // Get form data
             const formData = {
                 caller_id: document.getElementById('caller_id').value,
                 category: document.getElementById('category').value,
                 short_description: document.getElementById('short_description').value,
                 impact: document.getElementById('impact').value,
-                urgency: document.getElementById('urgency').value,
+                urgency: document.getElementById('urgency').value
             };
 
-            try {
-                console.log('enterd in try');
-                // ServiceNow Scripted REST API endpoint (replace with your instance URL)
-                const endpoint = 'https://dev187656.service-now.com/api/1299252/custom_website/inc_create';
-                
-                // Send data to ServiceNow using POST
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Basic ' + btoa('admin:Ironman@109'), // Replace with your credentials
-                        'Content-Type': 'application/json',
-                        'Accept' : 'application/json',
-                    },
-                    body: JSON.stringify({ data: formData }),
-            
-                });
-                console.log('end test');
-                const result = await response.json();
-
-                if (response.ok) {
+            // Make the fetch call to the ServiceNow REST API
+            fetch('https://dev187656.service-now.com/api/1299252/custom_website/inc_create', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Basic ' + btoa('admin:Ironman@109'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ data: formData }),
+                mode: 'cors',  // Ensure that the request follows CORS rules
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.sys_id) {
                     alert('Incident created successfully! Sys ID: ' + result.sys_id);
                 } else {
-                    alert('Failed to create incident: ' + result.message);
+                    alert('Error: ' + result.message);
                 }
-            } catch (error) {
+            })
+            .catch(error => {
                 console.error('Error:', error);
                 alert('An error occurred while creating the incident.');
-            }
-        });
+            });
+        }
     </script>
+</head>
+<body>
+    <h1>Create Incident</h1>
+    <form onsubmit="createIncident(event)">
+        <label for="caller_id">Caller ID:</label>
+        <input type="text" id="caller_id" name="caller_id" required><br><br>
 
+        <label for="category">Category:</label>
+        <input type="text" id="category" name="category" required><br><br>
+
+        <label for="short_description">Short Description:</label>
+        <input type="text" id="short_description" name="short_description" required><br><br>
+
+        <label for="impact">Impact:</label>
+        <input type="text" id="impact" name="impact" required><br><br>
+
+        <label for="urgency">Urgency:</label>
+        <input type="text" id="urgency" name="urgency" required><br><br>
+
+        <button type="submit">Create Incident</button>
+    </form>
 </body>
 </html>
