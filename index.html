@@ -3,127 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Incident</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f4f4f9;
-        }
-        h1 {
-            color: #333;
-        }
-        form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
-    <script>
-        // Function to handle the form submission and make the API call
-        async function createIncident(event) {
-            event.preventDefault();  // Prevent the form from submitting normally
-
-            // Get form data
-            const formData = {
-                caller_id: document.getElementById('caller_id').value,
-                category: document.getElementById('category').value,
-                short_description: document.getElementById('short_description').value,
-                impact: document.getElementById('impact').value,
-                urgency: document.getElementById('urgency').value
-            };
-
-            try {
-                // Make the fetch call to the ServiceNow REST API
-                const response = await fetch('https://dev187656.service-now.com/api/1299252/custom_website/inc_create', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Basic ' + btoa('admin:Ironman@109'),
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({ data: formData }),
-                    mode: 'cors',  // Ensure that the request follows CORS rules
-                });
-
-                // Parse the response as JSON
-                const result = await response.json();
-
-                // Check if incident was created successfully
-                if (result.sys_id) {
-                    alert('Incident created successfully! Sys ID: ' + result.sys_id);
-                } else {
-                    alert('Error: ' + result.message);
-                }
-            } catch (error) {
-                // Handle any errors that occur in the fetch or response parsing
-                console.error('Error:', error);
-                alert('An error occurred while creating the incident.');
-            }
-        }
-    </script>
+    <title>ServiceNow Incident Creation</title>
 </head>
 <body>
     <h1>Create Incident</h1>
-    <form onsubmit="createIncident(event)">
+    <form id="incidentForm">
         <label for="caller_id">Caller ID:</label>
         <input type="text" id="caller_id" name="caller_id" required><br><br>
 
         <label for="category">Category:</label>
-        <select id="category" name="category" required>
-            <option value="">Select Category</option>
-            <option value="Hardware">Hardware</option>
-            <option value="Software">Software</option>
-            <option value="Network">Network</option>
-            <option value="Other">Other</option>
-        </select><br><br>
+        <input type="text" id="category" name="category" required><br><br>
 
         <label for="short_description">Short Description:</label>
         <input type="text" id="short_description" name="short_description" required><br><br>
 
         <label for="impact">Impact:</label>
-        <select id="impact" name="impact" required>
-            <option value="">Select Impact</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-        </select><br><br>
+        <input type="text" id="impact" name="impact" required><br><br>
 
         <label for="urgency">Urgency:</label>
-        <select id="urgency" name="urgency" required>
-            <option value="">Select Urgency</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-        </select><br><br>
+        <input type="text" id="urgency" name="urgency" required><br><br>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea><br><br>
 
         <button type="submit">Create Incident</button>
     </form>
+
+    <script>
+        document.getElementById('incidentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Retrieve form data
+            const callerId = document.getElementById('caller_id').value;
+            const category = document.getElementById('category').value;
+            const shortDescription = document.getElementById('short_description').value;
+            const impact = document.getElementById('impact').value;
+            const urgency = document.getElementById('urgency').value;
+            const description = document.getElementById('description').value;
+
+            // Prepare the data to be sent
+            const data = {
+                caller_id: callerId,
+                category: category,
+                short_description: shortDescription,
+                impact: impact,
+                urgency: urgency,
+                description: description
+            };
+
+            // Fetch the access token from your server (ensure this endpoint is secured)
+            fetch('https://dev187656.service-now.com/oauth_token.do ')
+                .then(response => response.json())
+                .then(data => {
+                    const accessToken = data.access_token;
+
+                    // Send the data to ServiceNow Scripted REST API
+                    fetch('https://your-instance.service-now.com/api/your_namespace/incident', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => response.json())
+                    .then(responseData => {
+                        if (responseData.result) {
+                            alert('Incident created successfully!');
+                        } else {
+                            alert('Failed to create incident.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred.');
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching access token:', error);
+                    alert('An error occurred while fetching the access token.');
+                });
+        });
+    </script>
 </body>
 </html>
