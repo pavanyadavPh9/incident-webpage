@@ -102,13 +102,13 @@
 
             try {
                 // ServiceNow Scripted REST API endpoint (replace with your instance URL)
-                const endpoint = 'https://<your-instance>.service-now.com/api/incident_creation_api/create_incident';
+                const endpoint = 'https://dev187656.service-now.com/api/1299252/custom_website/inc_create';
                 
                 // Send data to ServiceNow using POST
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
-                        'Authorization': 'Basic ' + btoa('username:password'), // Replace with your credentials
+                        'Authorization': 'Basic ' + btoa('admin:^LzdKZ69rd%S'), // Replace with your credentials
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ data: formData }),
