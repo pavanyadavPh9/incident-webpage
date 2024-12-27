@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Incident Submission</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #fff;
+      color: #333;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2575fc;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-weight: bold;
+      margin: 10px 0 5px;
+    }
+    input, select, textarea, button {
+      padding: 10px;
+      margin: 5px 0 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    textarea {
+      resize: none;
+      height: 80px;
+    }
+    button {
+      background: #2575fc;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #6a11cb;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #bbb;
+    }
+    .footer a {
+      color: #6a11cb;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Create Incident</h1>
+    <form id="incidentForm">
+      <label for="caller_id">Caller ID:</label>
+      <input type="text" id="caller_id" name="caller_id" required>
+
+      <label for="category">Category:</label>
+      <select id="category" name="category" required>
+        <option value="Hardware">Hardware</option>
+        <option value="Software">Software</option>
+        <option value="Network">Network</option>
+      </select>
+
+      <label for="short_description">Short Description:</label>
+      <textarea id="short_description" name="short_description" required></textarea>
+
+      <label for="impact">Impact:</label>
+      <select id="impact" name="impact" required>
+        <option value="1">High</option>
+        <option value="2">Medium</option>
+        <option value="3">Low</option>
+      </select>
+
+      <label for="urgency">Urgency:</label>
+      <select id="urgency" name="urgency" required>
+        <option value="1">High</option>
+        <option value="2">Medium</option>
+        <option value="3">Low</option>
+      </select>
+
+      <button type="submit">Submit</button>
+    </form>
+    <div class="footer">
+      Powered by <a href="https://github.com" target="_blank">GitHub Pages</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('incidentForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      // Collect form data
+      const formData = {
+        caller_id: document.getElementById('caller_id').value,
+        category: document.getElementById('category').value,
+        short_description: document.getElementById('short_description').value,
+        impact: document.getElementById('impact').value,
+        urgency: document.getElementById('urgency').value,
+      };
+
+      try {
+        // ServiceNow endpoint and basic auth
+        const endpoint = 'https://<your_instance>.service-now.com/api/<namespace>/<resource>';
+        const auth = btoa('username:password'); // Replace with your ServiceNow credentials
+
+        // Send data to ServiceNow
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+          alert('Incident created successfully!');
+        } else {
+          alert('Failed to create incident. Check your credentials or endpoint.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while creating the incident.');
+      }
+    });
+  </script>
+</body>
+</html>
