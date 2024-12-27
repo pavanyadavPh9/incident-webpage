@@ -101,6 +101,7 @@
             };
 
             try {
+                console.log('enterd in try');
                 // ServiceNow Scripted REST API endpoint (replace with your instance URL)
                 const endpoint = 'https://dev187656.service-now.com/api/1299252/custom_website/inc_create';
                 
@@ -113,8 +114,9 @@
                         'Accept' : 'application/json',
                     },
                     body: JSON.stringify({ data: formData }),
+            
                 });
-
+                console.log('end test');
                 const result = await response.json();
 
                 if (response.ok) {
