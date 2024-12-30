@@ -1,68 +1,161 @@
-<script>
-    document.getElementById('incidentForm').addEventListener('submit', function (event) {
-        event.preventDefault();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiceNow Incident Creation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+        }
+        input, textarea, button {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Incident</h1>
+        <form id="incidentForm">
+            <label for="caller_id">Caller ID:</label>
+            <input type="text" id="caller_id" name="caller_id" required>
 
-        // Retrieve form data
-        const callerId = document.getElementById('caller_id').value;
-        const category = document.getElementById('category').value;
-        const shortDescription = document.getElementById('short_description').value;
-        const impact = document.getElementById('impact').value;
-        const urgency = document.getElementById('urgency').value;
-        const description = document.getElementById('description').value;
+            <label for="category">Category:</label>
+            <input type="text" id="category" name="category" required>
 
-        // Prepare the data to be sent
-        const formData = {
-            caller_id: callerId,
-            category: category,
-            short_description: shortDescription,
-            impact: impact,
-            urgency: urgency,
-            description: description
-        };
+            <label for="short_description">Short Description:</label>
+            <input type="text" id="short_description" name="short_description" required>
 
-        // Step 1: Fetch the OAuth access token
-        fetch('https://dev187656.service-now.com/oauth_token.do', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                grant_type: 'password',
-                client_id: '514aaab407d2498a905a0d5ef08f49fe',
-                client_secret: 'q^bwl8kd3w',
-                username: 'admin',
-                password: 'Ironman@109'
+            <label for="impact">Impact:</label>
+            <input type="text" id="impact" name="impact" required>
+
+            <label for="urgency">Urgency:</label>
+            <input type="text" id="urgency" name="urgency" required>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+
+            <button type="submit">Create Incident</button>
+            <div class="error" id="error-message"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('incidentForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Clear any previous error message
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = '';
+
+            // Retrieve form data
+            const callerId = document.getElementById('caller_id').value;
+            const category = document.getElementById('category').value;
+            const shortDescription = document.getElementById('short_description').value;
+            const impact = document.getElementById('impact').value;
+            const urgency = document.getElementById('urgency').value;
+            const description = document.getElementById('description').value;
+
+            // Prepare the data to be sent
+            const formData = {
+                caller_id: callerId,
+                category: category,
+                short_description: shortDescription,
+                impact: impact,
+                urgency: urgency,
+                description: description
+            };
+
+            // Step 1: Fetch the OAuth access token
+            fetch('https://dev187656.service-now.com/oauth_token.do', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    grant_type: 'password',
+                    client_id: '514aaab407d2498a905a0d5ef08f49fe',
+                    client_secret: 'q^bwl8kd3w',
+                    username: 'admin',
+                    password: 'Ironman@109'
+                })
             })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.access_token) {
-                    const accessToken = data.access_token;
+                .then(response => response.json())
+                .then(data => {
+                    if (data.access_token) {
+                        const accessToken = data.access_token;
 
-                    // Step 2: Call the Scripted REST API using the access token
-                    return fetch('https://dev187656.service-now.com/api/1299252/custom_website/inc_create', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(formData)
-                    });
-                } else {
-                    throw new Error('Failed to fetch access token.');
-                }
-            })
-            .then(response => response.json())
-            .then(responseData => {
-                if (responseData.result) {
-                    alert(`Incident created successfully! Incident ID: ${responseData.result.sys_id}`);
-                } else {
-                    alert('Failed to create incident.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred: ' + error.message);
-            });
-    });
-</script>
+                        // Step 2: Call the Scripted REST API using the access token
+                        return fetch('https://dev187656.service-now.com/api/1299252/custom_website/inc_create', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${accessToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(formData)
+                        });
+                    } else {
+                        throw new Error('Failed to fetch access token.');
+                    }
+                })
+                .then(response => response.json())
+                .then(responseData => {
+                    if (responseData.result) {
+                        alert(`Incident created successfully! Incident ID: ${responseData.result.sys_id}`);
+                        document.getElementById('incidentForm').reset();
+                    } else {
+                        errorMessage.textContent = 'Failed to create incident.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    errorMessage.textContent = 'An error occurred: ' + error.message;
+                });
+        });
+    </script>
+</body>
+</html>
